@@ -155,10 +155,10 @@ MQ2 输出经过分压后接入 STM32 ADC，避免 ADC 输入超过 3.3V。
 
 RGB LED 为共阳极结构：
 
-```text
+
 GPIO = 0 → LED 点亮
 GPIO = 1 → LED 熄灭
-3.8 照明灯控制
+### 3.8 照明灯控制
 信号	STM32 引脚	说明
 LIGHT_CTRL	PA8	MOS 管控制信号
 LIGHT+	12V_SYS	照明灯正极
@@ -168,7 +168,10 @@ LIGHT-	MOS Drain	照明灯负极
 
 LIGHT_CTRL = 1 → 照明灯亮
 LIGHT_CTRL = 0 → 照明灯灭
-3.9 蜂鸣器
+
+---
+
+### 3.9 蜂鸣器
 信号	STM32 引脚	说明
 BUZZER_CTRL	PD2	蜂鸣器控制
 
@@ -178,7 +181,10 @@ BUZZER_CTRL	PD2	蜂鸣器控制
 烟雾报警
 故障提示
 系统状态提示
-4. 软件架构
+
+---
+
+### 4. 软件架构
 
 本项目采用分层软件架构，整体分为：
 
@@ -205,7 +211,10 @@ Bootloader	固件升级功能预留
 FreeRTOS	实时操作系统
 Start	启动文件
 Library	STM32 标准外设库
-5. 工程目录说明
+
+---
+
+### 5. 工程目录说明
 5.1 User
 User
 ├── main.c
@@ -216,8 +225,11 @@ User
 main.c	系统入口，初始化基础模块并启动应用
 stm32f10x_conf.h	标准外设库配置文件
 stm32f10x_it.c	中断服务函数
-stm32f10x_it.h	中断函数声明
-5.2 Application 层
+stm32f10x_it.h	中断函数声明 
+
+---
+
+### 5.2 Application 层
 Application
 ├── app_main.c
 ├── sensor_task.c
@@ -242,7 +254,10 @@ task_auto.c	自动调速任务
 task_anti_backflow.c	防回流控制任务
 task_ui.c	LCD 显示刷新任务
 task_log.c	串口日志输出任务
-5.3 Service 层
+
+---
+
+### 5.3 Service 层
 Service
 ├── sensor_service.c
 ├── event_service.c
@@ -265,7 +280,10 @@ motor_control_service.c	电机控制服务
 pid_service.c	PID 控制算法
 ui_service.c	LCD 界面数据组织
 log_service.c	调试日志格式化输出
-5.4 Driver 层
+
+---
+
+### 5.4 Driver 层
 Driver
 ├── drv_console.c
 ├── drv_sensor.c
@@ -285,7 +303,9 @@ drv_lcd.c	LCD 显示驱动
 
 Driver 层只负责硬件模块的基础访问，不直接处理系统业务逻辑。
 
-5.5 BSP 层
+---
+
+### 5.5 BSP 层
 BSP
 ├── bsp_adc.c
 ├── bsp_delay.c
@@ -304,7 +324,10 @@ bsp_tim.c	定时器基础配置
 bsp_usart.c	USART 串口初始化与发送
 bsp_power.c	自锁电源控制
 bsp_sys.c	系统时钟、NVIC 等基础配置
-5.6 Common 层
+
+---
+
+### 5.6 Common 层
 Common
 ├── message_def.h
 ├── system_state.h
@@ -313,8 +336,11 @@ Common
 message_def.h	系统事件、消息类型定义
 system_state.h	系统运行状态数据结构
 board_pins.h	硬件引脚映射表
-6. FreeRTOS 任务设计
-6.1 任务划分
+
+---
+
+### 6. FreeRTOS 任务设计
+### 6.1 任务划分
 任务	周期	作用
 sensor_task	500 ms	采集温湿度和烟雾数据
 task_key	10 ms	按键扫描、消抖、短按长按识别
@@ -326,7 +352,10 @@ task_anti_backflow	100 ms	防回流状态机
 task_ui	200~500 ms	LCD 显示刷新
 task_log	500~1000 ms	串口调试日志输出
 power_task	100 ms	电源保持和关机处理
-6.2 任务通信方式
+
+---
+
+### 6.2 任务通信方式
 
 系统任务之间主要通过以下方式通信：
 
@@ -346,7 +375,10 @@ control_task 处理事件
 更新系统模式 / 风机档位 / 照明状态
     ↓
 motor_task / ui_task / log_task 根据系统状态执行动作
-7. 系统状态设计
+
+---
+
+### 7. 系统状态设计
 
 系统状态集中定义在 Common/system_state.h 中，用于保存当前运行状态。
 
@@ -364,7 +396,10 @@ PWM 占空比
 RGB 状态灯状态
 报警状态
 电源状态
-8. 系统工作模式
+
+---
+
+### 8. 系统工作模式
 模式	说明
 OFF	待机模式，风机关闭
 MANUAL	手动模式，通过按键切换风机档位
@@ -373,8 +408,11 @@ ALARM	报警模式，烟雾浓度过高时强制高速运行
 ANTI_BACKFLOW	防回流模式，根据烟雾变化趋势执行强排
 UPGRADE	升级模式，预留 Bootloader 功能
 ERROR	故障模式，如电机异常、传感器异常
-9. 控制逻辑
-9.1 手动模式
+
+---
+
+### 9. 控制逻辑
+### 9.1 手动模式
 
 手动模式下，通过 KEY_SPEED 切换风机档位：
 
@@ -382,7 +420,10 @@ ERROR	故障模式，如电机异常、传感器异常
 LOW	低速
 MID	中速
 HIGH	高速
-9.2 自动模式
+
+---
+
+### 9.2 自动模式
 
 自动模式下，系统根据 MQ2 烟雾浓度、温度、湿度计算目标转速。
 
@@ -397,7 +438,10 @@ HIGH	高速
 
 F = 0.6 * gas_factor + 0.2 * temperature_factor + 0.2 * humidity_factor
 target_rpm = rpm_min + F * (rpm_max - rpm_min)
-9.3 电机闭环控制
+
+---
+
+### 9.3 电机闭环控制
 
 编码器用于采集电机转速，PID 控制器根据目标转速和当前转速计算 PWM 占空比。
 
@@ -414,7 +458,10 @@ PWM duty
 TB6612
         ↓
 电机转速变化
-9.4 防回流控制
+
+---
+
+### 9.4 防回流控制
 
 防回流功能基于烟雾浓度变化趋势和阈值状态机实现。
 
@@ -432,7 +479,9 @@ TB6612
 
 防止烟雾浓度在阈值附近波动导致风机频繁启停。
 
-10. 日志输出
+---
+
+### 10. 日志输出
 
 系统通过 USART1 输出调试信息。
 
@@ -443,7 +492,10 @@ TB6612
 [MODE] AUTO
 [KEY] MODE_SHORT
 [ALARM] GAS_HIGH
-11. 当前项目进度
+
+---
+
+### 11. 当前项目进度
 
 已完成验证：
 
@@ -467,15 +519,21 @@ LCD 页面显示
 防回流状态机
 Bootloader 在线升级
 长时间运行稳定性测试
-12. 编译与下载
-12.1 开发环境
+
+---
+
+### 12. 编译与下载
+### 12.1 开发环境
 项目	说明
 IDE	Keil MDK
 Compiler	ARMCC V5
 MCU	STM32F103RCT6
 Debugger	ST-Link
 RTOS	FreeRTOS
-12.2 下载方式
+
+---
+
+### 12.2 下载方式
 
 使用 SWD 下载：
 
@@ -485,8 +543,11 @@ SWCLK	PA14
 NRST	NRST
 VCC	3.3V
 GND	GND
-13. 设计注意事项
-13.1 电机干扰
+
+---
+
+### 13. 设计注意事项
+### 13.1 电机干扰
 
 电机线和编码器线应尽量分开走线，避免电机 PWM 和有刷电机噪声干扰编码器输入。
 
@@ -497,7 +558,10 @@ GND	GND
 预留小电容滤波
 电机两端预留 100nF 抑制电容
 TB6612 VM 附近放置大电解电容
-13.2 MQ2 发热
+
+---
+
+### 13.2 MQ2 发热
 
 MQ2 内部有加热丝，工作时发热属于正常现象。
 
@@ -520,7 +584,9 @@ MOS 管
 
 建议放在板边，保证空气流通。
 
-13.4 供电稳定性
+---
+
+### 13.4 供电稳定性
 
 电机启动和 PWM 调速会造成电源波动，建议：
 
@@ -538,12 +604,12 @@ MCU 每个 VDD 附近放置 100nF 去耦电容
 完成 Bootloader + CRC32 固件升级
 完成项目测试数据记录
 整理项目文档和简历描述
-15. 项目特点
+
+---
+
+### 15. 项目特点
 
 本项目不是简单的传感器采集或普通 IoT 控制，而是围绕风机控制系统构建了完整的嵌入式实时控制框架，涵盖硬件设计、驱动开发、任务调度、传感器数据处理、电机闭环控制和状态机设计，适合作为嵌入式软件/嵌入式控制方向的综合项目。
 
 
-有两个小建议，免得 README 写得像公司年报一样庄严但工程里全是坑：
 
-1. 你工程里的文件名现在有些像 `drv_seno.c`、`drv_ctuator.c`，建议后面统一改成 `drv_sensor.c`、`drv_actuator.c`，不然 README 和工程对不上，找文件时像在考古。
-2. 如果你确定 SHT30 最终用的是 `PC0/PC1` 软件 I2C，就 README 里保持现在这样；如果后面改成 `PB10/PB11` 硬件 I2C2，记得
