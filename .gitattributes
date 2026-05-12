@@ -1,0 +1,17 @@
+* text=auto
+
+*.c text
+*.h text
+*.s text
+*.S text
+*.md text
+*.uvprojx text eol=crlf
+*.uvoptx text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.axf binary
+*.hex text

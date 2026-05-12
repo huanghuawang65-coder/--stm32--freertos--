@@ -1,0 +1,40 @@
+# Keil MDK build output
+Objects/
+Listings/
+*.o
+*.obj
+*.d
+*.crf
+*.axf
+*.elf
+*.map
+*.hex
+*.bin
+*.lst
+*.lnp
+*.dep
+*.htm
+*.build_log.htm
+
+# Keil user/local configuration
+*.uvopt
+*.uvoptx
+*.uvguix.*
+*.uvgui.*
+*.uvgui_*
+DebugConfig/
+
+# Editor/local files
+.vscode/
+*.user
+*.suo
+*.tmp
+*.bak
+*.log
+
+# Exported documentation generated from markdown
+*.html
+
+# OS files
+Thumbs.db
+Desktop.ini
