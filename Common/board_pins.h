@@ -32,39 +32,43 @@
 /* ===================== 烟机照明灯 =====================
  * 单独的照明灯为高电平有效。
  */
-#define LED_LIGHT_PORT             GPIOC
-#define LED_LIGHT_PIN              GPIO_Pin_6
-#define LED_LIGHT_GPIO_CLK         RCC_APB2Periph_GPIOC
+#define LED_LIGHT_PORT             GPIOA
+#define LED_LIGHT_PIN              GPIO_Pin_8
+#define LED_LIGHT_GPIO_CLK         RCC_APB2Periph_GPIOA
 #define LED_LIGHT_ACTIVE_LEVEL     1
 
 /* ===================== 蜂鸣器 =====================
  * 按键短按时短鸣，模拟真实烟机按键反馈。
+ *
+ * V2 原理图中 BUZZER_CTRL 接到 PD2。
+ * 如果后续确认硬件实际接到 PB2，只需要修改这里的三个宏。
  */
-#define BEEP_PORT                  GPIOB
-#define BEEP_PIN                   GPIO_Pin_0
-#define BEEP_GPIO_CLK              RCC_APB2Periph_GPIOB
+#define BEEP_PORT                  GPIOD
+#define BEEP_PIN                   GPIO_Pin_2
+#define BEEP_GPIO_CLK              RCC_APB2Periph_GPIOD
 #define BEEP_ACTIVE_LEVEL          1
 
 /* ===================== 电机 TB6612 =====================
- * MOTOR_PWM -> PA0 -> TIM2_CH1
+ * MOTOR_PWM -> PA15 -> TIM2_CH1 partial remap
  * MOTOR_IN1/IN2 控制方向
  * MOTOR_STBY 拉高后 TB6612 才退出待机
  */
 #define MOTOR_PWM_PORT             GPIOA
-#define MOTOR_PWM_PIN              GPIO_Pin_0
+#define MOTOR_PWM_PIN              GPIO_Pin_15
 #define MOTOR_PWM_GPIO_CLK         RCC_APB2Periph_GPIOA
+#define MOTOR_PWM_TIM2_PARTIAL_REMAP   1
 
-#define MOTOR_IN1_PORT             GPIOB
-#define MOTOR_IN1_PIN              GPIO_Pin_12
-#define MOTOR_IN1_GPIO_CLK         RCC_APB2Periph_GPIOB
+#define MOTOR_IN1_PORT             GPIOC
+#define MOTOR_IN1_PIN              GPIO_Pin_11
+#define MOTOR_IN1_GPIO_CLK         RCC_APB2Periph_GPIOC
 
-#define MOTOR_IN2_PORT             GPIOB
-#define MOTOR_IN2_PIN              GPIO_Pin_13
-#define MOTOR_IN2_GPIO_CLK         RCC_APB2Periph_GPIOB
+#define MOTOR_IN2_PORT             GPIOC
+#define MOTOR_IN2_PIN              GPIO_Pin_10
+#define MOTOR_IN2_GPIO_CLK         RCC_APB2Periph_GPIOC
 
-#define MOTOR_STBY_PORT            GPIOB
-#define MOTOR_STBY_PIN             GPIO_Pin_14
-#define MOTOR_STBY_GPIO_CLK        RCC_APB2Periph_GPIOB
+#define MOTOR_STBY_PORT            GPIOC
+#define MOTOR_STBY_PIN             GPIO_Pin_12
+#define MOTOR_STBY_GPIO_CLK        RCC_APB2Periph_GPIOC
 
 /* ===================== 电机编码器 =====================
  * ENCODER_A -> PB7 -> TIM4_CH2
@@ -73,7 +77,7 @@
  * 注意：
  * 1. PB6/PB7 也是 STM32F103 默认 I2C1_SCL/SDA。
  *    当前工程已经把 PB6/PB7 分配给编码器，不要再同时接 SHT30/I2C1。
- * 2. 如果编码器 A/B 是开漏输出，建议外接 4.7k~10k 上拉到 3.3V。
+ * 2. V2 原理图已经给 A/B 两路增加 10k 上拉到 3.3V。
  * 3. ENCODER_COUNTS_PER_REV 表示 TIM4 计数器转一圈累计的计数值，
  *    需要根据编码器线数、倍频方式和减速比实测修正。
  */
@@ -118,13 +122,13 @@
  * PWR_HOLD 拉高后保持系统 12V_SYS/后级电源。
  * KEY_POWER 按下为低电平。
  */
-#define PWR_HOLD_PORT              GPIOC
-#define PWR_HOLD_PIN               GPIO_Pin_10
-#define PWR_HOLD_GPIO_CLK          RCC_APB2Periph_GPIOC
+#define PWR_HOLD_PORT              GPIOB
+#define PWR_HOLD_PIN               GPIO_Pin_8
+#define PWR_HOLD_GPIO_CLK          RCC_APB2Periph_GPIOB
 
-#define KEY_POWER_PORT             GPIOC
-#define KEY_POWER_PIN              GPIO_Pin_13
-#define KEY_POWER_GPIO_CLK         RCC_APB2Periph_GPIOC
+#define KEY_POWER_PORT             GPIOB
+#define KEY_POWER_PIN              GPIO_Pin_9
+#define KEY_POWER_GPIO_CLK         RCC_APB2Periph_GPIOB
 #define KEY_POWER_ACTIVE_LEVEL     0
 
 /* ===================== 面板按键 =====================
@@ -140,20 +144,29 @@
 #define KEY_SPEED_GPIO_CLK         RCC_APB2Periph_GPIOB
 #define KEY_SPEED_ACTIVE_LEVEL     0
 
-#define KEY_LIGHT_PORT             GPIOC
-#define KEY_LIGHT_PIN              GPIO_Pin_5
-#define KEY_LIGHT_GPIO_CLK         RCC_APB2Periph_GPIOC
+#define KEY_LIGHT_PORT             GPIOB
+#define KEY_LIGHT_PIN              GPIO_Pin_1
+#define KEY_LIGHT_GPIO_CLK         RCC_APB2Periph_GPIOB
 #define KEY_LIGHT_ACTIVE_LEVEL     0
 
-#define KEY_UPGRADE_PORT           GPIOC
-#define KEY_UPGRADE_PIN            GPIO_Pin_11
-#define KEY_UPGRADE_GPIO_CLK       RCC_APB2Periph_GPIOC
+#define KEY_UPGRADE_PORT           GPIOB
+#define KEY_UPGRADE_PIN            GPIO_Pin_0
+#define KEY_UPGRADE_GPIO_CLK       RCC_APB2Periph_GPIOB
 #define KEY_UPGRADE_ACTIVE_LEVEL   0
 
 /* ===================== 传感器 ===================== */
-#define DHT11_PORT                 GPIOC
-#define DHT11_PIN                  GPIO_Pin_0
-#define DHT11_GPIO_CLK             RCC_APB2Periph_GPIOC
+/*
+ * SHT30 使用软件 I2C，避免占用 PB6/PB7 的硬件 I2C1 引脚，
+ * 因为 PB6/PB7 已经分配给电机编码器 TIM4。
+ */
+#define SHT30_I2C_SCL_PORT         GPIOC
+#define SHT30_I2C_SCL_PIN          GPIO_Pin_0
+#define SHT30_I2C_SCL_GPIO_CLK     RCC_APB2Periph_GPIOC
+
+#define SHT30_I2C_SDA_PORT         GPIOC
+#define SHT30_I2C_SDA_PIN          GPIO_Pin_1
+#define SHT30_I2C_SDA_GPIO_CLK     RCC_APB2Periph_GPIOC
+#define SHT30_I2C_ADDRESS          0x44
 
 #define GAS_ADC_PORT               GPIOA
 #define GAS_ADC_PIN                GPIO_Pin_1

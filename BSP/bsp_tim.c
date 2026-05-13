@@ -2,7 +2,8 @@
 #include "board_pins.h"
 
 /* ===================== TIM2_CH1 电机 PWM =====================
- * PA0 复用为 TIM2_CH1，输出给 TB6612 的 PWMA。
+ * V2 原理图：MOTOR_PWM -> PA15 -> TIM2_CH1 partial remap。
+ * PA15 默认是 JTAG 引脚，使用前需要关闭 JTAG、保留 SWD 调试。
  * 上层 drv_motor_pwm.c 使用 0~1000 的占空比抽象，
  * 本文件只负责把比较值写入 TIM2 CCR1。
  */
@@ -19,6 +20,15 @@ void TIM2_PWM_CH1_Init(u16 arr, u16 psc)
 
     RCC_APB2PeriphClockCmd(MOTOR_PWM_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+#if (MOTOR_PWM_TIM2_PARTIAL_REMAP == 1)
+    /*
+     * TIM2 partial remap 1：TIM2_CH1 从 PA0 改到 PA15。
+     * PA15 属于 JTAG 默认占用脚，因此关闭 JTAG 但保留 SWD，后续仍可用 SWD 下载调试。
+     */
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+    GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);
+#endif
 
     gpio.GPIO_Pin = MOTOR_PWM_PIN;
     gpio.GPIO_Mode = GPIO_Mode_AF_PP;

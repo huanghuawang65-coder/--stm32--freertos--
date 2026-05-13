@@ -1,9 +1,9 @@
 #include "control_service.h"
 #include "drv_actuator.h"
+#include "log_service.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
-#include <stdio.h>
 
 /*
  * control_service.c
@@ -165,7 +165,7 @@ static void Control_Service_HandleModeShort(void)
     Control_Service_UnlockState();
 
     (void)RGB_Led_SetColor(Control_Service_ModeToRgb(next_mode));
-    printf("[KEY] MODE -> %s\r\n", Control_Service_ModeText(next_mode));
+    LOG_INFO("KEY MODE -> %s", Control_Service_ModeText(next_mode));
 }
 
 static void Control_Service_HandleSpeedShort(void)
@@ -179,7 +179,7 @@ static void Control_Service_HandleSpeedShort(void)
     if (mode != SYS_MODE_MANUAL)
     {
         Control_Service_UnlockState();
-        printf("[KEY] SPEED ignored in %s mode\r\n", Control_Service_ModeText(mode));
+        LOG_WARN("KEY SPEED ignored in %s mode", Control_Service_ModeText(mode));
         return;
     }
 
@@ -207,7 +207,7 @@ static void Control_Service_HandleSpeedShort(void)
 
     Control_Service_UnlockState();
 
-    printf("[KEY] SPEED -> %s\r\n", Control_Service_FanText(next_level));
+    LOG_INFO("KEY SPEED -> %s", Control_Service_FanText(next_level));
 }
 
 static void Control_Service_HandleLightShort(void)
@@ -222,7 +222,7 @@ static void Control_Service_HandleLightShort(void)
     Control_Service_UnlockState();
 
     Control_Service_SetLight(next_light);
-    printf("[KEY] LIGHT -> %s\r\n", next_light ? "ON" : "OFF");
+    LOG_INFO("KEY LIGHT -> %s", next_light ? "ON" : "OFF");
 }
 
 static void Control_Service_HandleUpgradeLong(void)
@@ -235,7 +235,7 @@ static void Control_Service_HandleUpgradeLong(void)
     Control_Service_UnlockState();
 
     (void)RGB_Led_SetColor(RGB_COLOR_PURPLE);
-    printf("[KEY] UPGRADE long press -> wait bootloader\r\n");
+    LOG_INFO("KEY UPGRADE long press -> wait bootloader");
 }
 
 void Control_Service_Init(void)

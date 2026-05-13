@@ -1,8 +1,8 @@
 #include "auto_control_service.h"
 #include "message_def.h"
+#include "log_service.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include <stdio.h>
 
 /* ===================== 多传感器融合参数 ===================== */
 #define AUTO_TEMP_BASE                 20
@@ -199,9 +199,9 @@ static int16_t Auto_Control_ProcessState(const AutoFusion_t *fusion)
         {
             Auto_Control_Reset(AUTO_CONTROL_STATE_ADJUST);
             target_rpm = fusion->target_rpm;
-            printf("[AUTO] adjust enter F=%d target=%d\r\n",
-                   fusion->fusion_factor,
-                   target_rpm);
+            LOG_INFO("AUTO adjust enter F=%d target=%d",
+                     fusion->fusion_factor,
+                     target_rpm);
         }
         break;
 
@@ -217,15 +217,15 @@ static int16_t Auto_Control_ProcessState(const AutoFusion_t *fusion)
         {
             Auto_Control_Reset(AUTO_CONTROL_STATE_ADJUST);
             target_rpm = fusion->target_rpm;
-            printf("[AUTO] min->adjust F=%d target=%d\r\n",
-                   fusion->fusion_factor,
-                   target_rpm);
+            LOG_INFO("AUTO min->adjust F=%d target=%d",
+                     fusion->fusion_factor,
+                     target_rpm);
         }
         else if (s_min_run_ticks >= AUTO_MIN_RUN_TICKS)
         {
             Auto_Control_Reset(AUTO_CONTROL_STATE_IDLE);
             target_rpm = 0;
-            printf("[AUTO] idle F=%d\r\n", fusion->fusion_factor);
+            LOG_INFO("AUTO idle F=%d", fusion->fusion_factor);
         }
         break;
 
@@ -254,7 +254,7 @@ static int16_t Auto_Control_ProcessState(const AutoFusion_t *fusion)
         {
             Auto_Control_Reset(AUTO_CONTROL_STATE_IDLE);
             target_rpm = 0;
-            printf("[AUTO] adjust exit F=%d\r\n", fusion->fusion_factor);
+            LOG_INFO("AUTO adjust exit F=%d", fusion->fusion_factor);
         }
         else if (s_adjust_ticks >= AUTO_MAX_ADJUST_TICKS)
         {
@@ -264,7 +264,7 @@ static int16_t Auto_Control_ProcessState(const AutoFusion_t *fusion)
              */
             Auto_Control_Reset(AUTO_CONTROL_STATE_MIN_RUN);
             target_rpm = AUTO_TARGET_MIN_RPM;
-            printf("[AUTO] adjust timeout F=%d\r\n", fusion->fusion_factor);
+            LOG_INFO("AUTO adjust timeout F=%d", fusion->fusion_factor);
         }
         break;
 
@@ -301,7 +301,7 @@ void Auto_Control_Service_Process(void)
         if (input.mode == SYS_MODE_AUTO)
         {
             Auto_Control_Reset(AUTO_CONTROL_STATE_MIN_RUN);
-            printf("[AUTO] mode enter\r\n");
+            LOG_INFO("AUTO mode enter");
         }
         else
         {

@@ -2,9 +2,9 @@
 #include "pid_service.h"
 #include "drv_motor_pwm.h"
 #include "message_def.h"
+#include "log_service.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include <stdio.h>
 
 /* ===================== 手动模式目标转速和开环 PWM ===================== */
 #define MOTOR_MANUAL_LOW_RPM             190
@@ -313,7 +313,7 @@ void Motor_Control_Service_Process(void)
     {
         if (s_motor_running || s_last_target_rpm != 0)
         {
-            printf("[MOTOR] stop\r\n");
+            LOG_INFO("MOTOR stop");
         }
 
         s_last_target_rpm = 0;
@@ -335,11 +335,11 @@ void Motor_Control_Service_Process(void)
             s_start_boost_ticks = MOTOR_START_BOOST_TICKS;
         }
 
-        printf("[MOTOR] target=%d mode=%d auto=%d backflow=%d\r\n",
-               target_rpm,
-               input.mode,
-               input.auto_target_rpm,
-               input.backflow_target_rpm);
+        LOG_INFO("MOTOR target=%d mode=%d auto=%d backflow=%d",
+                 target_rpm,
+                 input.mode,
+                 input.auto_target_rpm,
+                 input.backflow_target_rpm);
     }
 
 #if MOTOR_ENCODER_PID_ENABLE
@@ -387,20 +387,20 @@ void Motor_Control_Service_Process(void)
     if (++s_debug_count >= MOTOR_DEBUG_PRINT_PERIOD)
     {
         s_debug_count = 0;
-        printf("[MOTOR] mode=%d rpm=%d delta=%d ea=%d eb=%d sp=%u target=%d duty=%d F=%d auto_st=%d bf_st=%d bf=%d boost=%d pid=%s\r\n",
-               input.mode,
-               input.current_rpm,
-               input.encoder_delta,
-               input.encoder_a_level,
-               input.encoder_b_level,
-               input.speed_sample_count,
-               target_rpm,
-               duty,
-               input.auto_factor,
-               input.auto_state,
-               input.backflow_state,
-               input.backflow_active,
-               s_start_boost_ticks,
-               MOTOR_ENCODER_PID_ENABLE ? "on" : "off");
+        LOG_INFO("MOTOR m=%d rpm=%d d=%d ea=%d eb=%d sp=%u tgt=%d pwm=%d F=%d as=%d bs=%d bf=%d bst=%d pid=%s",
+                 input.mode,
+                 input.current_rpm,
+                 input.encoder_delta,
+                 input.encoder_a_level,
+                 input.encoder_b_level,
+                 input.speed_sample_count,
+                 target_rpm,
+                 duty,
+                 input.auto_factor,
+                 input.auto_state,
+                 input.backflow_state,
+                 input.backflow_active,
+                 s_start_boost_ticks,
+                 MOTOR_ENCODER_PID_ENABLE ? "on" : "off");
     }
 }

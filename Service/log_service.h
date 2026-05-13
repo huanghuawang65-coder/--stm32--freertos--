@@ -7,7 +7,7 @@
 
 /* Log queue depth and one-message text buffer size. */
 #define LOG_QUEUE_LENGTH      16
-#define LOG_TEXT_MAX_LEN      96
+#define LOG_TEXT_MAX_LEN      128
 
 typedef enum
 {

@@ -14,6 +14,10 @@ int main(void)
     }
 
     Console_Init(115200);
+    /*
+     * 这里 FreeRTOS 和日志队列还没有启动，只能直接输出早期启动信息。
+     * 系统进入任务调度后，业务日志统一改由 log_service 处理。
+     */
     printf("[BOOT] PWR_HOLD on\r\n");
 
     if (BSP_Power_WaitKeyRelease(1500))

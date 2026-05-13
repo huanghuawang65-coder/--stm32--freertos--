@@ -20,7 +20,7 @@ static void Log_Task_PrintStackWatermark(TickType_t *last_tick)
    }
 
    now = xTaskGetTickCount();
-   if ((*last_tick == 0) ||
+       if ((*last_tick == 0) ||
        ((now - *last_tick) >= pdMS_TO_TICKS(LOG_TASK_STACK_WATERMARK_PERIOD_MS)))
    {
        *last_tick = now;
@@ -30,6 +30,10 @@ static void Log_Task_PrintStackWatermark(TickType_t *last_tick)
            xSemaphoreTake(uart_mutex, portMAX_DELAY);
        }
 
+       /*
+        * log_task 是日志服务的最终串口出口。
+        * 这里不能再调用 LOG_INFO，否则日志会重新投递回 log_queue，形成自循环。
+        */
        printf("[INFO] STACK log_task free=%u words\r\n",
               (unsigned int)uxTaskGetStackHighWaterMark(NULL));
 
@@ -77,6 +81,10 @@ void log_task(void *pvParameters)
                xSemaphoreTake(uart_mutex, portMAX_DELAY);
            }
 
+           /*
+            * 业务层统一使用 LOG_INFO/LOG_WARN/LOG_ERROR。
+            * 真正的 printf 只集中在日志任务里，便于后续统一改格式或关闭调试输出。
+            */
            printf("[%s] %s\r\n", Log_LevelToText(msg.level), msg.text);
 
            if (uart_mutex != NULL)

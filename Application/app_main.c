@@ -94,7 +94,7 @@ void start_task(void *pvParameters);
  * ControlTask      event  消费按键事件，切换模式、档位、照明、升级状态。
  * AutoControlTask  100ms  温度/湿度/MQ2 融合，计算自动模式目标转速。
  * AntiBackFlowTask 100ms  防回流状态机，必要时抬高自动模式目标转速。
- * SensorTask       2s     读取 DHT11 和 MQ2，并打印环境数据。
+ * SensorTask       2s     读取 SHT30 和 MQ2，并打印环境数据。
  * UiTask           200ms  刷新 LCD 状态页，优先级最低。
  */
 #define POWER_TASK_PRIO             5
@@ -155,8 +155,6 @@ void start_task(void *pvParameters)
 {
     (void)pvParameters;
 
-    printf("FreeRTOS hood system started\r\n");
-
     /*
      * system_event_queue 用于离散事件，例如按键短按/长按。
      * 连续状态量，例如传感器数值、目标转速、防回流状态，
@@ -171,6 +169,7 @@ void start_task(void *pvParameters)
      */
     log_queue = xQueueCreate(LOG_QUEUE_LENGTH, sizeof(LogMessage_t));
     configASSERT(log_queue != NULL);
+    LOG_INFO("FreeRTOS hood system started");
 
     uart_mutex = xSemaphoreCreateMutex();
     configASSERT(uart_mutex != NULL);
@@ -266,6 +265,10 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
     (void)xTask;
 
     taskDISABLE_INTERRUPTS();
+    /*
+     * FreeRTOS 异常 Hook 触发时系统已经不适合再依赖队列调度，
+     * 因此这里保留直接 printf，确保致命错误能尽量输出。
+     */
     printf("\r\n[FreeRTOS] Stack overflow! Task: %s\r\n", pcTaskName);
 
     while (1)
@@ -276,6 +279,10 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 void vApplicationMallocFailedHook(void)
 {
     taskDISABLE_INTERRUPTS();
+    /*
+     * 内存申请失败属于致命错误路径，此时日志队列可能也无法继续工作，
+     * 所以这里同样保留直接 printf 作为兜底提示。
+     */
     printf("\r\n[FreeRTOS] Malloc failed!\r\n");
 
     while (1)

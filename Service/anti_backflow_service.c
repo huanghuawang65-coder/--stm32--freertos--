@@ -1,8 +1,8 @@
 #include "anti_backflow_service.h"
 #include "message_def.h"
+#include "log_service.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include <stdio.h>
 
 /*
  * 防回流核心不是硬件复杂，而是状态机：
@@ -237,10 +237,10 @@ void Anti_Backflow_Service_Process(void)
 
     if (old_state != s_backflow_state)
     {
-        printf("[BACKFLOW] %s -> %s gas=%d\r\n",
-               Anti_Backflow_StateText(old_state),
-               Anti_Backflow_StateText(s_backflow_state),
-               input.gas_percent);
+        LOG_INFO("BACKFLOW %s -> %s gas=%d",
+                 Anti_Backflow_StateText(old_state),
+                 Anti_Backflow_StateText(s_backflow_state),
+                 input.gas_percent);
     }
 
     if (s_backflow_state == BACKFLOW_ACTIVE)
